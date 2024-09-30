@@ -32,12 +32,23 @@ public class Raytracer : MonoBehaviour {
     {
         if (raytracingEnabled)
         {
+            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+            RaycastHit hit;
+            Color color = new Color(0,0,0,1);
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                RaytracingMaterial rmat =  hit.collider.gameObject.GetComponent<RaytracingMaterial>();
+                if (rmat != null)
+                {
+                    color = rmat.color;
+                }
+            }
+            
             for (int y = 0; y < screenTexture.height; y++)
             {
                 for (int x = 0; x < screenTexture.width; x++)
                 {
-                    float darkness = (float)x / (screenTexture.width - 1);
-                    Color color = new Color(1 - darkness, 1 - darkness, 1 - darkness, 1);
                     screenTexture.SetPixel(x, y, color);
                 }
             }
