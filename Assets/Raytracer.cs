@@ -32,24 +32,11 @@ public class Raytracer : MonoBehaviour {
     {
         if (raytracingEnabled)
         {
-            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-            RaycastHit hit;
-            Color color = new Color(0,0,0,1);
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                RaytracingMaterial rmat =  hit.collider.gameObject.GetComponent<RaytracingMaterial>();
-                if (rmat != null)
-                {
-                    color = rmat.color;
-                }
-            }
-            
             for (int y = 0; y < screenTexture.height; y++)
             {
                 for (int x = 0; x < screenTexture.width; x++)
                 {
-                    screenTexture.SetPixel(x, y, color);
+                    screenTexture.SetPixel(x, y, CastSingleRay(x, y));
                 }
             }
 
@@ -61,5 +48,29 @@ public class Raytracer : MonoBehaviour {
         {
             screenRenderer.enabled = false;
         }
+    }
+
+    Color CastSingleRay(int px, int py)
+    {
+        float u = (float)px / textureWidth;
+        float v = (float)py / textureHeight;
+
+        Vector3 screenPos = new Vector3(u * Screen.width, v * Screen.height, 0);
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+
+        RaycastHit hit;
+        Color color = new Color(0, 0, 0, 1);
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            RaytracingMaterial rmat = hit.collider.gameObject.GetComponent<RaytracingMaterial>();
+            if (rmat != null)
+            {
+                color = rmat.color;
+            }
+        }
+
+        return color;
     }
 }
